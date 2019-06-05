@@ -24,4 +24,12 @@ class RegularStateStoreBenchmark {
         }
     }
 
+    @Test
+    fun simpleRecursiveCallTest() {
+        benchmarkRule.measureRepeated {
+            stateStore.get { state ->
+                stateStore.set { copy(count = state.count + 1) }
+            }
+        }
+    }
 }
