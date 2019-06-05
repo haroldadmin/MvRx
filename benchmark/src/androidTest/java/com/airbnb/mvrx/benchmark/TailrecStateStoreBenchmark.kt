@@ -10,7 +10,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TailrecStateStoreBenchmark {
 
-    @get:Rule val benchmarkRule = BenchmarkRule()
+    @get:Rule
+    val benchmarkRule = BenchmarkRule()
 
     private val stateStore = TailrecStateStore(TestState())
     private val count = 1000
@@ -33,4 +34,18 @@ class TailrecStateStoreBenchmark {
         }
     }
 
+    @Test
+    fun complexRecursiveCallTest() {
+        benchmarkRule.measureRepeated {
+            stateStore.get {
+                stateStore.set {
+                    stateStore.set { copy(count = this.count + 1) }
+                    copy(count = this.count - 1)
+                }
+            }
+            stateStore.get {
+                // Just to flush the queues again
+            }
+        }
+    }
 }
